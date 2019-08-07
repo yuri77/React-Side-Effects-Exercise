@@ -1,53 +1,66 @@
-import React, { useState, useEffect } from "react";
+import React, { Component } from "react";
 import axios from "axios";
 import "./App.css";
 
 import PersonCard from "./components/PersonCard";
 import ItemList from "./components/ItemList";
 
-function App() {
-  const [people, setPeople] = useState([]);
-  const [items, setItems] = useState([]);
-  const [selectedPerson, setSelectedPerson] = useState({});
+class App extends Component {
+  constructor() {
+    super();
+    this.state = {
+      people: [],
+      items: [],
+      selectedPerson: {}
+    };
+  }
 
-  useEffect(() => {
+  componentDidMount() {
     axios
       .get("https://powerful-beyond-74276.herokuapp.com/api/wishlist")
       .then(res => {
-        setPeople(res.data);
+        this.setState({ people: res.data });
       })
       .catch(err => {
         console.log(err);
       });
-  }, []);
+  }
 
-  useEffect(() => {
-    if (selectedPerson.id) {
+  componentDidUpdate(prevState) {
+    if (prevState.selectedPerson !== this.state.selectedPerson) {
       axios
         .get(
           `https://powerful-beyond-74276.herokuapp.com/api/wishlist/${
-            selectedPerson.id
+            this.state.selectedPerson.id
           }`
         )
         .then(res => {
-          setItems(res.data);
+          this.setState({ items: res.data });
         })
         .catch(err => {
           console.log(err);
         });
     }
-  }, [selectedPerson]);
+  }
 
-  return (
-    <div className="App">
-      {people.map(person => (
-        <div onClick={() => setSelectedPerson(person)} key={person.id}>
-          <PersonCard person={person} />
-          {person.id === selectedPerson.id ? <ItemList list={items} /> : null}
-        </div>
-      ))}
-    </div>
-  );
+  setSelectedPerson = person => {
+    this.setState({ selectedPerson: person });
+  };
+
+  render() {
+    return (
+      <div className="App">
+        {this.state.people.map(person => (
+          <div onClick={() => this.setSelectedPerson(person)} key={person.id}>
+            <PersonCard person={person} />
+            {person.id === this.state.selectedPerson.id && (
+              <ItemList list={this.state.items} />
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  }
 }
 
 export default App;
