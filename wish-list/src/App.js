@@ -19,6 +19,11 @@ class App extends Component {
     };
   }
 
+  componentDidMount(){
+    
+  }
+
+  }
   // Fetch the list of people using the appropriate life-cycle method
   // Code here!
 
